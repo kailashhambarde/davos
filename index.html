@@ -1755,11 +1755,11 @@ research.id='research';
 research.innerHTML='<style>#research{position:fixed;left:22px;top:110px;width:290px;padding:20px;background:rgba(12,31,43,.94);color:#e7f4f7;border-radius:12px;z-index:15;font:13px Outfit,sans-serif;box-shadow:0 8px 35px #102a3330}#research h2{font-size:23px;line-height:1.15;margin:8px 0 12px}#research p{line-height:1.5;color:#bed1d9}#research small{font-size:10px;letter-spacing:1px;color:#85c9d5}#research canvas{width:100%;height:125px;background:#162b35;image-rendering:pixelated}#research select{width:100%;margin:8px 0;padding:9px;background:#213d49;border:1px solid #527581;color:white}#research output{display:block;font:12px monospace;line-height:1.8;color:#81e4e8}#research button{background:none;color:#a8d9e5;border:0;cursor:pointer;float:right}@media(max-width:1050px){#research{top:auto;bottom:145px;width:230px;padding:12px}#research canvas{height:90px}#research h2{font-size:19px}#research p{font-size:11px}}#research.collapsed>*:not(header){display:none}#research.collapsed{width:230px}</style><header><small>IT / UBI · RESEARCH CONCEPT</small><button id="research-collapse" type="button" aria-label="Collapse research explanation">−</button></header><h2>Long-range person detection</h2><p>As range increases, fewer pixels describe a person. Walking, running and background clutter make observation harder.</p><label for="research-condition">Observation difficulty</label><select id="research-condition"><option value="clear">Clear view</option><option value="haze">Atmospheric haze</option><option value="resolution">Reduced spatial resolution</option></select><canvas id="research-crop" width="256" height="125" aria-label="Magnified camera crop of the reference person"></canvas><small>MAGNIFIED CAMERA CROP · NO DETAIL RESTORED</small><output id="research-measure"></output><p id="research-message"></p><small>SIMULATED SCENE GEOMETRY<br>Boxes illustrate location, not model accuracy</small>';
 document.body.appendChild(research);
 var personPicker=document.createElement('select');personPicker.id='research-person';personPicker.setAttribute('aria-label','Person to inspect');
-personPicker.innerHTML='<option value="walk">P02 · Walking person</option><option value="run">P03 · Running person</option><option value="standing">P01 · Standing person</option>';
+personPicker.innerHTML='<option value="standing">P01 · Standing person</option><option value="walk">P02 · Walking person</option><option value="run">P03 · Running person</option>';
 research.insertBefore(personPicker,$('research-crop'));
 var personSummary=document.createElement('output');personSummary.id='person-summary';research.insertBefore(personSummary,personPicker);
-research.querySelector('h2').textContent='Finding every person at range';
-research.querySelector('p').textContent='Three people: standing, walking and running. Can each still be distinguished as the drone climbs? Select a person to inspect their actual camera pixels.';
+research.querySelector('h2').textContent='Can we see all three?';
+research.querySelector('p').textContent='Three people. One camera. Watch them shrink and disappear behind trees as altitude rises.';
 var personBoxes={standing:$('detection-box')};
 ['walk','run'].forEach(function(key){var box=$('detection-box').cloneNode(true);box.id='detection-'+key;$('feed').appendChild(box);personBoxes[key]=box;});
 document.getElementById('research-collapse').onclick=function(){research.classList.toggle('collapsed');this.textContent=research.classList.contains('collapsed')?'+':'−';};
@@ -1771,7 +1771,44 @@ var modeBar=document.createElement('div');modeBar.id='study-modes';
 var trackingBanner=document.createElement('div');trackingBanner.style.cssText='position:fixed;left:50%;bottom:145px;transform:translateX(-50%);z-index:18;background:#102c38ed;color:#f8c274;padding:13px 22px;border-left:3px solid #f8c274;font:600 18px Outfit,sans-serif;pointer-events:none;display:none;max-width:48vw';document.body.appendChild(trackingBanner);
 modeBar.innerHTML='<style>#study-modes{position:fixed;top:72px;left:22px;z-index:20;display:flex;gap:4px}#study-modes button{border:1px solid #567681;background:#183642;color:#daeaf0;border-radius:5px;padding:9px 12px;cursor:pointer}#study-modes button[aria-pressed="true"]{background:#f3bd68;color:#182f38;border-color:#f3bd68}#study-state{font:600 17px Outfit,sans-serif;color:#ffc36a;white-space:pre-line;margin:8px 0}#study-reference{height:70px;width:100%;image-rendering:pixelated}#study-events{font:11px monospace;color:#bfd0d8;white-space:pre-line;line-height:1.5;max-height:66px;overflow:hidden}#research{max-height:calc(100vh - 260px);overflow:auto}#study-reset{float:none!important;border:1px solid #527581!important;padding:7px!important;margin-top:8px}@media(max-width:600px){#study-modes{top:67px;left:12px}#study-modes button{padding:8px;font-size:11px}#research{max-height:46vh}}</style><button type="button" data-mode="detection" aria-pressed="true">Detection</button><button type="button" data-mode="tracking" aria-pressed="false">Tracking</button><button type="button" data-mode="search" aria-pressed="false">Visual Search</button>';
 document.body.appendChild(modeBar);
+var presentationStyle=document.createElement('style');
+presentationStyle.textContent=`
+  .rail,.blurb,.legend,.keys,#compare,#follow,#speed,.bottom .sep,#telemetry-panel .hud-head,#telemetry-panel .cell:not(:first-child),#telemetry-panel .phase{display:none!important}
+  .topbar{padding:18px 24px}.brand{background:rgba(255,255,255,.9);padding:9px 14px;border-radius:14px;box-shadow:var(--shadow)}
+  #study-modes{top:90px;left:24px;gap:8px}#study-modes button{font:700 13px Outfit,sans-serif;border-radius:10px;padding:11px 17px;box-shadow:0 5px 16px #0e2c3b3d}
+  #research{top:150px;left:24px;width:320px;max-height:calc(100vh - 245px);padding:19px 20px;background:rgba(12,31,43,.96);border:1px solid #69849377;box-shadow:0 18px 48px #102a335c}
+  #research h2{font-size:25px;margin:10px 0}#research>p:first-of-type{font-size:14px;color:#eef8fb;margin-bottom:15px}
+  #research #person-summary{font:600 15px Outfit,sans-serif;color:#ffcf83;line-height:1.4;margin:10px 0}
+  #research #research-measure{font:12px Outfit,sans-serif;line-height:1.4;color:#c7e7ed;margin-top:7px}
+  #research #research-message,#research #study-events,#research>small:last-of-type,#research #search-options,#research #search-controls p{display:none!important}
+  #research #study-reference{display:none!important}body[data-study-mode="search"] #research #study-reference{display:block!important;height:65px;border:1px solid #547784;border-radius:7px}
+  body[data-study-mode="detection"] #research #study-state{display:none!important}
+  #research #research-crop{height:115px;object-fit:contain;border:1px solid #547784;border-radius:7px}
+  #research #study-state{font:700 18px Outfit,sans-serif;line-height:1.25;margin:10px 0;color:#ffcf83}
+  #research #research-condition,#research #research-person,#research #search-policy{border-radius:8px;font:12px Outfit,sans-serif;padding:8px}
+  #research #search-controls p{font-size:12px;line-height:1.35;margin-bottom:5px}
+  .right{top:100px;right:24px;width:min(52vw,740px);gap:8px}
+  .monitor{border-radius:16px;border:4px solid #f6fbfc;box-shadow:0 22px 70px #071c2880;background:transparent}
+  .mon-bar{padding:11px 14px;background:#f6fbfc}.mon-cap{display:none}.feed{min-height:0;aspect-ratio:16/9;background:transparent}
+  #telemetry-panel{align-self:flex-end;width:auto;padding:8px 12px;border-radius:10px;background:rgba(12,31,43,.92);color:white}
+  #telemetry-panel .grid2{display:block}#telemetry-panel .cell{background:none;border:0;padding:0;display:flex;align-items:baseline;gap:9px}
+  #telemetry-panel .cell .k{color:#a8d9e5}#telemetry-panel .cell .v{color:white;font-size:14px}#telemetry-panel .cell .v small{color:#a8d9e5}
+  #camera-caption{background:rgba(12,31,43,.96);color:white;border-radius:12px;padding:12px 16px;box-shadow:0 10px 30px #071c2852;font:600 16px Outfit,sans-serif}
+  #camera-caption small{display:block;color:#8edfe9;font:10px 'IBM Plex Mono',monospace;letter-spacing:.16em;margin-bottom:4px}
+  #camera-caption strong{color:#ffcf83}
+  #tracking-banner{display:none!important}
+  #record-demo{top:auto!important;bottom:20px!important;left:24px!important;opacity:.85}
+  .bottom{justify-content:center;padding-bottom:18px}.bottom .side{display:none}.dock{padding:8px 10px}
+  @media(max-width:900px){.right{width:min(56vw,560px)}#research{width:260px;left:16px;top:145px;padding:14px;max-height:calc(100vh - 240px)}#research h2{font-size:20px}#study-modes{left:16px}.topbar{padding:14px 16px}}
+  @media(max-width:700px){.topbar{padding:8px}.brand{padding:6px 8px}.brand h1{font-size:16px}.brand .sub{font-size:8px}#study-modes{top:63px;left:8px;right:8px;justify-content:center}#study-modes button{padding:8px 10px;font-size:11px}.right{top:108px;right:8px;left:8px;width:auto}#camera-caption{font-size:13px;padding:8px 11px}#research{top:auto;bottom:84px;left:8px;right:8px;width:auto;max-height:30vh;overflow:auto;padding:10px 12px}#research h2{font-size:17px;margin:4px 0}#research>p:first-of-type{font-size:12px;margin-bottom:5px}#research #research-crop,#research #research-measure,#research>small{display:none!important}#research #person-summary{font-size:12px;margin:3px 0}#research #research-person{margin:3px 0}#telemetry-panel{display:none}#record-demo{display:none}.bottom{padding:0 8px 8px}.dock{transform:scale(.82);transform-origin:bottom center}}
+`;
+document.body.appendChild(presentationStyle);
+var cameraCaption=document.createElement('div');cameraCaption.id='camera-caption';cameraCaption.innerHTML='<small>LIVE DRONE VIEW · SIMULATED SCENE</small><span id="camera-caption-text">Three people are in the scene. Watch who remains visible as the drone climbs.</span>';
+document.querySelector('.right').insertBefore(cameraCaption,$('telemetry-panel'));
+trackingBanner.id='tracking-banner';
+document.body.setAttribute('data-study-mode','detection');
 var captureButton=document.createElement('button');captureButton.type='button';captureButton.textContent='Record 8s';captureButton.setAttribute('aria-label','Record eight seconds of the live demonstration');captureButton.style.cssText='position:fixed;top:72px;left:325px;z-index:20;background:#183642;color:white;border:1px solid #567681;border-radius:5px;padding:9px 12px;cursor:pointer';document.body.appendChild(captureButton);
+captureButton.id='record-demo';
 captureButton.onclick=function(){
   var stream=renderer.domElement.captureStream(24),chunks=[];
   var recorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp8',videoBitsPerSecond:2500000});
@@ -1815,11 +1852,14 @@ resetStudy.onclick=clearStudy;
 modeBar.addEventListener('click',function(event){
  var mode=event.target.getAttribute('data-mode');if(!mode)return;
  studyMode=mode;clearStudy();
+ document.body.setAttribute('data-study-mode',mode);
+ $('research-person').value=mode==='detection'?'standing':'walk';
  if(mode==='tracking'||mode==='search'||cur.name==='Tracking altitude study'||cur.name==='Visual search study')setPattern('orbit');
  searchControls.style.display=mode==='search'?'block':'none';
  modeBar.querySelectorAll('button').forEach(function(button){button.setAttribute('aria-pressed',String(button.getAttribute('data-mode')===mode));});
- research.querySelector('h2').textContent=mode==='detection'?'Finding every person at range':mode==='tracking'?'Following the same person':'Where should the camera look?';
- research.querySelector('p').textContent=mode==='detection'?'Standing, walking and running people become smaller as range increases.':mode==='tracking'?'Observed positions leave a short trail. When visibility stops, the estimate expands until a candidate reappears.':'A saved reference and last-seen motion guide a camera scan. Search uses observation memory, not the hidden person’s current position.';
+ research.querySelector('h2').textContent=mode==='detection'?'Can we see all three?':mode==='tracking'?'Can we keep the same person?':'Where did they go?';
+ research.querySelector('p').textContent=mode==='detection'?'Three people. One camera. Watch them shrink and disappear behind trees as altitude rises.':mode==='tracking'?'Follow one person through motion and brief occlusion. The trail shows what was actually seen.':'Save one person’s appearance, then search likely places after they disappear.';
+ $('camera-caption-text').textContent=mode==='detection'?'DETECTION · Which people are visible in this frame?':mode==='tracking'?'TRACKING · The camera follows one person across frames.':'VISUAL SEARCH · The camera chooses where to look next.';
  refCanvas.style.display=mode==='detection'?'none':'block';
  studyEvent(mode==='detection'?'Frame observations':mode==='tracking'?'Illustrative identity association':'Select a person; acquire a reference');
 });
@@ -1853,7 +1893,7 @@ function updateStudyGraphics(){
    var estimate=memory.position.clone().addScaledVector(memory.velocity,Math.min(age,3));
    searchArea.position.set(estimate.x,.14,estimate.z);searchArea.scale.setScalar(.7+age*1.4);searchArea.visible=true;
    stateLabel.textContent=(studyMode==='search'?'Searching · viewpoint '+(searchCandidateIndex+1)+'/3':'Observation lost · predicting')+'\nLast seen '+age.toFixed(1)+' s ago';
- }else stateLabel.textContent=studyTime<memory.candidateUntil?'REACQUIRING · candidate association':'FOLLOWING '+(selected==='walk'?'P02 · WALKER':selected==='run'?'P03 · RUNNER':'P01 · STANDING');
+ }else stateLabel.textContent=studyTime<memory.candidateUntil?'REACQUIRING · candidate association':studyMode==='search'?'REFERENCE ACQUIRED':'FOLLOWING '+(selected==='walk'?'P02 · WALKER':selected==='run'?'P03 · RUNNER':'P01 · STANDING');
  if(studyMode==='tracking'){
    var flightSeconds=progress*cur.dur;
    var flightLevel=Math.min(12,Math.max(1,Math.floor(Math.max(0,flightSeconds-4)/19)+1));
@@ -1910,7 +1950,7 @@ function updateResearch(minX,minY,maxX,maxY,person,name){
   cropContext.drawImage(sampleCanvas,0,0,sampleCanvas.width,sampleCanvas.height,65,0,125,125);
   var pixels=(maxY-minY)*f.height*ratio/2/reduction;
   var distance=droneCam.position.distanceTo(person.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.85,0)));
-  $('research-measure').textContent=name+'\nSlant range '+distance.toFixed(1)+' m · altitude '+(drone.position.y-DRONE_LIFT).toFixed(1)+' m\nPerson height '+pixels.toFixed(1)+' px in '+(condition==='resolution'?'reduced crop':'rendered feed');
+  $('research-measure').textContent=name+' · '+distance.toFixed(0)+' m away · '+pixels.toFixed(0)+' pixels tall';
   $('research-message').textContent=pixels<12?'Only a few pixels remain. Magnification enlarges them without recovering detail.':pixels<30?'Body detail is fading. Small targets become harder to distinguish from the background.':'A closer view preserves more body detail. Watch the crop as Crane Up climbs to 120 m.';
 }
 function updateDetection(){
@@ -1958,9 +1998,14 @@ function updateDetection(){
   box.style.width=((maxX-minX)*50)+'%';box.style.height=((maxY-minY)*50)+'%';
   });
   people.forEach(function(person){if(!observedKeys[person.key])observePerson(person,false);});
-  $('person-summary').textContent=studyMode==='tracking'?'ONE SELECTED IDENTITY\nCyan: observed trail\nAmber: prediction during loss\nAssociation uses scripted scene identity':visibleCount+' / 3 people in camera frame\n'+rows.join('\n');
+  $('person-summary').textContent=studyMode==='tracking'?'Following '+(selected==='walk'?'the walker':selected==='run'?'the runner':'the standing person'):studyMode==='search'?'Searching for '+(selected==='walk'?'the walker':selected==='run'?'the runner':'the standing person'):visibleCount+' of 3 people in the camera view';
   $('person-summary').style.whiteSpace='pre-line';
-  if(!selectedVisible){cropContext.clearRect(0,0,256,125);$('research-measure').textContent='Selected person is outside the camera frame or still loading';$('research-message').textContent='The original drone camera follows the standing person. The walker and runner may enter or leave its field of view.';}
+  var selectedMemory=trackMemory[selected];
+  if(studyMode==='detection')$('camera-caption-text').textContent=visibleCount+' of 3 people are in view. '+(visibleCount<3?'Others are outside the frame or behind cover.':'Watch the boxes as altitude rises.');
+  else if(studyMode==='tracking')$('camera-caption-text').textContent=!selectedMemory||!selectedMemory.seen?'ACQUIRING · Waiting for the selected person to enter view.':studyTime-selectedMemory.lastTime>.2?'TARGET HIDDEN · Amber area predicts where to look.':'TARGET VISIBLE · Cyan trail shows observed movement.';
+  else $('camera-caption-text').textContent=!selectedMemory||!selectedMemory.seen?'ACQUIRING · Waiting for a clear reference view.':studyTime-selectedMemory.lastTime>.2?'TARGET LOST · Checking likely views from last seen motion.':'REFERENCE VISIBLE · Appearance saved for search.';
+  cropCanvas.style.display=selectedVisible?'block':'none';
+  if(!selectedVisible){cropContext.clearRect(0,0,256,125);$('research-measure').textContent='Selected person is outside the camera view';$('research-message').textContent='The original drone camera follows the standing person. The walker and runner may enter or leave its field of view.';}
   updateStudyGraphics();
 }
 function loop(){
